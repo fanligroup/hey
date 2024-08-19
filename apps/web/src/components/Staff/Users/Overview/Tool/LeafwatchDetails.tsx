@@ -1,17 +1,16 @@
 import type { FC } from 'react';
 
 import MetaDetails from '@components/Shared/MetaDetails';
-import getAuthApiHeaders from '@helpers/getAuthApiHeaders';
+import { getAuthApiHeaders } from '@helpers/getAuthApiHeaders';
 import {
-  ComputerDesktopIcon,
   CursorArrowRaysIcon,
   EyeIcon,
-  GlobeAltIcon,
-  MapPinIcon
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
 import { AdjustmentsVerticalIcon } from '@heroicons/react/24/solid';
 import { HEY_API_URL } from '@hey/data/constants';
 import humanize from '@hey/helpers/humanize';
+import { H5 } from '@hey/ui';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -25,9 +24,6 @@ const LeafwatchDetails: FC<LeafwatchDetailsProps> = ({ profileId }) => {
     city: string;
     country: string;
     events: number;
-    os: string;
-    region: string;
-    version: string;
   } | null> => {
     try {
       const response = await axios.get(
@@ -79,7 +75,7 @@ const LeafwatchDetails: FC<LeafwatchDetailsProps> = ({ profileId }) => {
       <div className="divider my-5 border-dashed border-yellow-600" />
       <div className="mt-5 flex items-center space-x-2 text-yellow-600">
         <AdjustmentsVerticalIcon className="size-5" />
-        <div className="text-lg font-bold">Leafwatch Details</div>
+        <H5>Leafwatch Details</H5>
       </div>
       <div className="mt-3 space-y-2 font-bold">
         <MetaDetails
@@ -95,23 +91,10 @@ const LeafwatchDetails: FC<LeafwatchDetailsProps> = ({ profileId }) => {
           {humanize(leafwatchDetails.events)}
         </MetaDetails>
         <MetaDetails
-          icon={<MapPinIcon className="ld-text-gray-500 size-4" />}
-          title="Location"
-        >
-          {leafwatchDetails.city}, {leafwatchDetails.region},{' '}
-          {leafwatchDetails.country}
-        </MetaDetails>
-        <MetaDetails
-          icon={<ComputerDesktopIcon className="ld-text-gray-500 size-4" />}
-          title="OS"
-        >
-          {leafwatchDetails.os}
-        </MetaDetails>
-        <MetaDetails
           icon={<GlobeAltIcon className="ld-text-gray-500 size-4" />}
           title="Browser"
         >
-          {leafwatchDetails.browser} {leafwatchDetails.version}
+          {leafwatchDetails.browser}
         </MetaDetails>
       </div>
     </>

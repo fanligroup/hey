@@ -3,14 +3,14 @@ import type { FC } from 'react';
 
 import ProfileListShimmer from '@components/Shared/Shimmer/ProfileListShimmer';
 import UserProfile from '@components/Shared/UserProfile';
-import { ArrowLeftIcon, RectangleStackIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import { ProfileLinkSource } from '@hey/data/tracking';
 import {
   LimitType,
   OpenActionCategoryType,
   useWhoActedOnPublicationQuery
 } from '@hey/lens';
-import { Card, EmptyState, ErrorMessage } from '@hey/ui';
+import { Card, EmptyState, ErrorMessage, H5 } from '@hey/ui';
 import Link from 'next/link';
 import { Virtuoso } from 'react-virtuoso';
 import { useProfileStore } from 'src/store/persisted/useProfileStore';
@@ -53,7 +53,7 @@ const Collectors: FC<CollectorsProps> = ({ publicationId }) => {
     return (
       <div className="p-5">
         <EmptyState
-          icon={<RectangleStackIcon className="size-8" />}
+          icon={<ShoppingBagIcon className="size-8" />}
           message="No collectors."
         />
       </div>
@@ -76,7 +76,7 @@ const Collectors: FC<CollectorsProps> = ({ publicationId }) => {
         <Link href={`/posts/${publicationId}`}>
           <ArrowLeftIcon className="size-5" />
         </Link>
-        <b className="text-lg">Collected by</b>
+        <H5>Collected by</H5>
       </div>
       <div className="divider" />
       <Virtuoso

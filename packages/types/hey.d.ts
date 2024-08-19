@@ -9,7 +9,9 @@ export type StaffPick = {
 };
 
 export type Feature = {
-  assigned: string;
+  _count: {
+    profiles: number;
+  };
   createdAt: Date;
   enabled: boolean;
   id: string;
@@ -80,24 +82,6 @@ export type Preferences = {
 
 export type ProfileDetails = {
   isSuspended: boolean;
-  pinnedPublication: null | string;
-};
-
-type UniswapToken = {
-  address: string;
-  chainId: number;
-  decimals: string;
-  symbol: string;
-};
-
-export type UniswapQuote = {
-  amountOut: string;
-  maxSlippage: string;
-  route: {
-    tokenIn: UniswapToken;
-    tokenOut: UniswapToken;
-  };
-  routeString: string;
 };
 
 export type Draft = {
@@ -106,12 +90,4 @@ export type Draft = {
   createdAt: Date;
   id: string;
   updatedAt: Date;
-};
-
-export type ScoreAllocation = {
-  description: string;
-  icon: string;
-  id: string;
-  name: string;
-  score: number;
 };

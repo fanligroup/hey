@@ -3,7 +3,7 @@ import type { FC } from 'react';
 
 import Loader from '@components/Shared/Loader';
 import ToggleWithHelper from '@components/Shared/ToggleWithHelper';
-import getAuthApiHeaders from '@helpers/getAuthApiHeaders';
+import { getAuthApiHeaders } from '@helpers/getAuthApiHeaders';
 import { Leafwatch } from '@helpers/leafwatch';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import { HEY_API_URL } from '@hey/data/constants';
@@ -11,7 +11,15 @@ import { FeatureFlag } from '@hey/data/feature-flags';
 import { STAFFTOOLS } from '@hey/data/tracking';
 import getAllFeatureFlags from '@hey/helpers/api/getAllFeatureFlags';
 import formatDate from '@hey/helpers/datetime/formatDate';
-import { Badge, Button, Card, EmptyState, ErrorMessage, Modal } from '@hey/ui';
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  ErrorMessage,
+  H5,
+  Modal
+} from '@hey/ui';
 import cn from '@hey/ui/cn';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -87,7 +95,7 @@ const List: FC = () => {
   return (
     <Card>
       <div className="flex items-center justify-between space-x-5 p-5">
-        <div className="text-lg font-bold">Feature Flags</div>
+        <H5>Feature Flags</H5>
         <Button onClick={() => setShowCreateModal(!showCreateModal)}>
           Create
         </Button>
@@ -123,9 +131,9 @@ const List: FC = () => {
                         {feature.key}
                       </b>
                       <Badge variant="secondary">{feature.type}</Badge>
-                      {feature.assigned !== '0' && (
+                      {feature._count.profiles !== 0 && (
                         <Badge variant="warning">
-                          {feature.assigned} assigned
+                          {feature._count.profiles} assigned
                         </Badge>
                       )}
                     </div>
@@ -141,7 +149,6 @@ const List: FC = () => {
                     }}
                     outline
                     size="sm"
-                    variant="secondary"
                   >
                     Assign
                   </Button>

@@ -2,9 +2,9 @@ import type { Profile } from '@hey/lens';
 import type { FC } from 'react';
 
 import UserProfile from '@components/Shared/UserProfile';
-import getAuthApiHeaders from '@helpers/getAuthApiHeaders';
+import { getAuthApiHeaders } from '@helpers/getAuthApiHeaders';
 import { IS_MAINNET } from '@hey/data/constants';
-import getPreferences from '@hey/helpers/api/getPreferences';
+import getInternalPreferences from '@hey/helpers/api/getInternalPreferences';
 import { useQuery } from '@tanstack/react-query';
 
 import FeatureFlags from './FeatureFlags';
@@ -20,8 +20,8 @@ interface ProfileStaffToolProps {
 
 const ProfileStaffTool: FC<ProfileStaffToolProps> = ({ profile }) => {
   const { data: preferences } = useQuery({
-    queryFn: () => getPreferences(profile.id, getAuthApiHeaders()),
-    queryKey: ['getPreferences', profile.id || '']
+    queryFn: () => getInternalPreferences(profile.id, getAuthApiHeaders()),
+    queryKey: ['getInternalPreferences', profile.id || '']
   });
 
   return (
@@ -37,7 +37,6 @@ const ProfileStaffTool: FC<ProfileStaffToolProps> = ({ profile }) => {
       />
       <ProfileOverview profile={profile} />
       {preferences ? <ProfilePreferences preferences={preferences} /> : null}
-      <div className="divider my-5 border-dashed border-yellow-600" />
       {IS_MAINNET ? (
         <>
           <LeafwatchDetails profileId={profile.id} />

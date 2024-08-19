@@ -1,11 +1,13 @@
-import type { Handler } from 'express';
+import type { Request, Response } from 'express';
 
+import prisma from '@hey/db/prisma/db/client';
+import { delRedis } from '@hey/db/redisClient';
 import logger from '@hey/helpers/logger';
 import parseJwt from '@hey/helpers/parseJwt';
-import heyPg from 'src/db/heyPg';
 import catchedError from 'src/helpers/catchedError';
+import { rateLimiter } from 'src/helpers/middlewares/rateLimiter';
 import validateLensAccount from 'src/helpers/middlewares/validateLensAccount';
-import { invalidBody, noBody, notAllowed } from 'src/helpers/responses';
+import { invalidBody, noBody } from 'src/helpers/responses';
 import { object, string } from 'zod';
 
 type ExtensionRequest = {
@@ -18,82 +20,60 @@ const validationSchema = object({
   poll: string().uuid()
 });
 
-export const post: Handler = async (req, res) => {
-  const { body } = req;
+export const post = [
+  rateLimiter({ requests: 30, within: 1 }),
+  validateLensAccount,
+  async (req: Request, res: Response) => {
+    const { body } = req;
 
-  if (!body) {
-    return noBody(res);
-  }
-
-  const validation = validationSchema.safeParse(body);
-
-  if (!validation.success) {
-    return invalidBody(res);
-  }
-
-  const validateLensAccountStatus = await validateLensAccount(req);
-  if (validateLensAccountStatus !== 200) {
-    return notAllowed(res, validateLensAccountStatus);
-  }
-
-  const { option, poll } = body as ExtensionRequest;
-
-  try {
-    const identityToken = req.headers['x-identity-token'] as string;
-    const payload = parseJwt(identityToken);
-
-    const expired = await heyPg.exists(
-      `
-        SELECT * FROM "Poll"
-        WHERE id = $1
-        AND ("endsAt" < CURRENT_TIMESTAMP OR "endsAt" IS NULL)
-        LIMIT 1;
-      `,
-      [poll]
-    );
-
-    if (expired) {
-      return res.status(400).json({ error: 'Poll expired.', success: false });
+    if (!body) {
+      return noBody(res);
     }
-    // End: Check if the poll expired
 
-    // Begin: Check if the poll exists and delete the existing response
-    const existingResponse = await heyPg.query(
-      `
-        SELECT pr.*
-        FROM "PollResponse" AS pr
-        JOIN "PollOption" AS o ON pr."optionId" = o.id
-        WHERE o."pollId" = $1 AND pr."profileId" = $2
-        LIMIT 1;
-      `,
-      [poll, payload.id]
-    );
+    const validation = validationSchema.safeParse(body);
 
-    if (existingResponse[0]?.id) {
-      await heyPg.query(
-        `
-          DELETE FROM "PollResponse"
-          WHERE "id" = $1;
-        `,
-        [existingResponse[0].id]
-      );
+    if (!validation.success) {
+      return invalidBody(res);
     }
-    // End: Check if the poll exists and delete the existing response
 
-    const data = await heyPg.query(
-      `
-        INSERT INTO "PollResponse" ("optionId", "profileId")
-        VALUES ($1, $2)
-        ON CONFLICT ("optionId", "profileId") DO NOTHING
-        RETURNING *;
-      `,
-      [option, payload.id]
-    );
+    const { option, poll } = body as ExtensionRequest;
 
-    logger.info(`Responded to a poll ${option}:${data[0]?.id}`);
+    try {
+      const identityToken = req.headers['x-identity-token'] as string;
+      const payload = parseJwt(identityToken);
 
-    return res.status(200).json({ id: data[0]?.id, success: true });
-  } catch (error) {
-    return catchedError(res, error);
+      const expired = await prisma.poll.findUnique({
+        select: { endsAt: true },
+        where: { endsAt: { lt: new Date() }, id: poll as string }
+      });
+
+      if (expired) {
+        return res.status(400).json({ error: 'Poll expired.', success: false });
+      }
+      // End: Check if the poll expired
+
+      // Begin: Check if the poll exists and delete the existing response
+      const existingResponse = await prisma.pollResponse.findFirst({
+        where: { option: { pollId: poll as string }, profileId: payload.id }
+      });
+
+      if (existingResponse?.id) {
+        await prisma.pollResponse.delete({
+          where: { id: existingResponse.id }
+        });
+      }
+      // End: Check if the poll exists and delete the existing response
+
+      const data = await prisma.pollResponse.create({
+        data: { optionId: option, profileId: payload.id }
+      });
+
+      await delRedis(`poll:${poll}`);
+      logger.info(`Responded to a poll ${option}:${data.id}`);
+
+      return res.status(200).json({ id: data.id, success: true });
+    } catch (error) {
+      return catchedError(res, error);
+    }
   }
-};
+];

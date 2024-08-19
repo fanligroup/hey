@@ -62,7 +62,7 @@ export default async function Page({ params }: Props) {
                 <br />
                 India
                 <br />
-                billing@hey.xyz
+                billing@heyxyz.zohodesk.in
                 <br />
                 <div className="pt-2" />
                 <b className="text-gray-500">GST: 29AYKPY4219R1Z8</b>
@@ -72,7 +72,7 @@ export default async function Page({ params }: Props) {
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             <div>
               <b className="text-lg text-gray-800">Bill to</b>
-              <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
+              <h5 className="text-lg font-semibold text-gray-800">{name}</h5>
               <address className="mt-2 not-italic text-gray-800">
                 {address}
               </address>

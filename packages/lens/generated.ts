@@ -74,7 +74,6 @@ export type Scalars = {
 
 export type ActOnOpenActionInput = {
   multirecipientCollectOpenAction?: InputMaybe<Scalars['Boolean']['input']>;
-  protocolSharedRevenueCollectOpenAction?: InputMaybe<ProtocolSharedRevenueActRedeemInput>;
   simpleCollectOpenAction?: InputMaybe<Scalars['Boolean']['input']>;
   unknownOpenAction?: InputMaybe<UnknownOpenActionActRedeemInput>;
 };
@@ -387,7 +386,6 @@ export type ClaimableTokensResult = {
 
 export type CollectActionModuleInput = {
   multirecipientCollectOpenAction?: InputMaybe<MultirecipientFeeCollectModuleInput>;
-  protocolSharedRevenueCollectOpenAction?: InputMaybe<ProtocolSharedRevenueCollectModuleInput>;
   simpleCollectOpenAction?: InputMaybe<SimpleCollectOpenActionModuleInput>;
 };
 
@@ -409,7 +407,6 @@ export enum CollectOpenActionModuleType {
   LegacySimpleCollectModule = 'LegacySimpleCollectModule',
   LegacyTimedFeeCollectModule = 'LegacyTimedFeeCollectModule',
   MultirecipientFeeCollectOpenActionModule = 'MultirecipientFeeCollectOpenActionModule',
-  ProtocolSharedRevenueCollectOpenActionModule = 'ProtocolSharedRevenueCollectOpenActionModule',
   SimpleCollectOpenActionModule = 'SimpleCollectOpenActionModule',
   UnknownOpenActionModule = 'UnknownOpenActionModule'
 }
@@ -1329,7 +1326,7 @@ export type DisputedReport = {
   createdAt: Scalars['DateTime']['output'];
   disputeReason: Scalars['String']['output'];
   disputer: Profile;
-  reportAdditionalInfo?: Maybe<Scalars['String']['output']>;
+  reportAdditionalInfo: Scalars['String']['output'];
   reportReason: Scalars['String']['output'];
   reportSubreason: Scalars['String']['output'];
   reportedProfile: Profile;
@@ -3609,7 +3606,6 @@ export type OpenActionModule =
   | LegacySimpleCollectModuleSettings
   | LegacyTimedFeeCollectModuleSettings
   | MultirecipientFeeCollectOpenActionSettings
-  | ProtocolSharedRevenueCollectOpenActionSettings
   | SimpleCollectOpenActionSettings
   | UnknownOpenActionModuleSettings;
 
@@ -3630,7 +3626,6 @@ export enum OpenActionModuleType {
   LegacySimpleCollectModule = 'LegacySimpleCollectModule',
   LegacyTimedFeeCollectModule = 'LegacyTimedFeeCollectModule',
   MultirecipientFeeCollectOpenActionModule = 'MultirecipientFeeCollectOpenActionModule',
-  ProtocolSharedRevenueCollectOpenActionModule = 'ProtocolSharedRevenueCollectOpenActionModule',
   SimpleCollectOpenActionModule = 'SimpleCollectOpenActionModule',
   UnknownOpenActionModule = 'UnknownOpenActionModule'
 }
@@ -4394,60 +4389,6 @@ export type ProfilesRequestWhere = {
   whoMirroredPublication?: InputMaybe<Scalars['PublicationId']['input']>;
   /** Pass the publication id and get a list of the profiles who quoted it */
   whoQuotedPublication?: InputMaybe<Scalars['PublicationId']['input']>;
-};
-
-export type ProtocolSharedRevenueActRedeemInput = {
-  /** The frontend app address that the collector uses */
-  executorClient?: InputMaybe<Scalars['EvmAddress']['input']>;
-};
-
-export type ProtocolSharedRevenueCollectModuleInput = {
-  amount?: InputMaybe<AmountInput>;
-  collectLimit?: InputMaybe<Scalars['String']['input']>;
-  /** The wallet of a client app to share revenues alongside the recipient and the protocol. Optional. */
-  creatorClient?: InputMaybe<Scalars['EvmAddress']['input']>;
-  endsAt?: InputMaybe<Scalars['DateTime']['input']>;
-  followerOnly: Scalars['Boolean']['input'];
-  recipient?: InputMaybe<Scalars['EvmAddress']['input']>;
-  referralFee?: InputMaybe<Scalars['Float']['input']>;
-};
-
-export type ProtocolSharedRevenueCollectOpenActionSettings = {
-  __typename?: 'ProtocolSharedRevenueCollectOpenActionSettings';
-  /** The collect module amount info. `Amount.value = 0` in case of free collects. */
-  amount: Amount;
-  /** The maximum number of collects for this publication. */
-  collectLimit?: Maybe<Scalars['String']['output']>;
-  /** The collect nft address - only deployed on first collect */
-  collectNft?: Maybe<Scalars['EvmAddress']['output']>;
-  contract: NetworkAddress;
-  /** If supplied, this is the app that will receive a split of the shared revenue together with the recipient as well as the protocol */
-  creatorClient?: Maybe<Scalars['EvmAddress']['output']>;
-  /** The distribution of the shared revenue */
-  distribution: ProtocolSharedRevenueDistribution;
-  /** The end timestamp after which collecting is impossible. */
-  endsAt?: Maybe<Scalars['DateTime']['output']>;
-  /** True if only followers of publisher may collect the post. */
-  followerOnly: Scalars['Boolean']['output'];
-  /** The collect module mint fee info. Mint fee is 10 Bonsai in case of free collects, otherwise 0. */
-  mintFee: Amount;
-  /** The collect module recipient address */
-  recipient: Scalars['EvmAddress']['output'];
-  /** The collect module referral fee */
-  referralFee: Scalars['Float']['output'];
-  type: OpenActionModuleType;
-};
-
-export type ProtocolSharedRevenueDistribution = {
-  __typename?: 'ProtocolSharedRevenueDistribution';
-  /** The split percentage that goes to the app that the content creator used when publishing */
-  creatorClientSplit: Scalars['Float']['output'];
-  /** The split percentage that goes the content creator. Should be between 0.01 and 100.00 */
-  creatorSplit: Scalars['Float']['output'];
-  /** The split percentage that goes to the app that the user used when collecting */
-  executorClientSplit: Scalars['Float']['output'];
-  /** The split percentage that goes to the Lens protocol */
-  protocolSplit: Scalars['Float']['output'];
 };
 
 export type PublicationBookmarkRequest = {
@@ -6232,9 +6173,6 @@ export type CommentBaseFieldsFragment = {
         __typename?: 'MultirecipientFeeCollectOpenActionSettings';
       } & OpenActionModulesFields_MultirecipientFeeCollectOpenActionSettings_Fragment)
     | ({
-        __typename?: 'ProtocolSharedRevenueCollectOpenActionSettings';
-      } & OpenActionModulesFields_ProtocolSharedRevenueCollectOpenActionSettings_Fragment)
-    | ({
         __typename?: 'SimpleCollectOpenActionSettings';
       } & OpenActionModulesFields_SimpleCollectOpenActionSettings_Fragment)
     | ({
@@ -6416,9 +6354,6 @@ type OpenActionModulesFields_MultirecipientFeeCollectOpenActionSettings_Fragment
     }>;
   };
 
-type OpenActionModulesFields_ProtocolSharedRevenueCollectOpenActionSettings_Fragment =
-  { __typename?: 'ProtocolSharedRevenueCollectOpenActionSettings' };
-
 type OpenActionModulesFields_SimpleCollectOpenActionSettings_Fragment = {
   __typename?: 'SimpleCollectOpenActionSettings';
   type: OpenActionModuleType;
@@ -6453,7 +6388,6 @@ export type OpenActionModulesFieldsFragment =
   | OpenActionModulesFields_LegacySimpleCollectModuleSettings_Fragment
   | OpenActionModulesFields_LegacyTimedFeeCollectModuleSettings_Fragment
   | OpenActionModulesFields_MultirecipientFeeCollectOpenActionSettings_Fragment
-  | OpenActionModulesFields_ProtocolSharedRevenueCollectOpenActionSettings_Fragment
   | OpenActionModulesFields_SimpleCollectOpenActionSettings_Fragment
   | OpenActionModulesFields_UnknownOpenActionModuleSettings_Fragment;
 
@@ -6550,9 +6484,6 @@ export type PostFieldsFragment = {
     | ({
         __typename?: 'MultirecipientFeeCollectOpenActionSettings';
       } & OpenActionModulesFields_MultirecipientFeeCollectOpenActionSettings_Fragment)
-    | ({
-        __typename?: 'ProtocolSharedRevenueCollectOpenActionSettings';
-      } & OpenActionModulesFields_ProtocolSharedRevenueCollectOpenActionSettings_Fragment)
     | ({
         __typename?: 'SimpleCollectOpenActionSettings';
       } & OpenActionModulesFields_SimpleCollectOpenActionSettings_Fragment)
@@ -6765,9 +6696,6 @@ export type QuoteBaseFieldsFragment = {
     | ({
         __typename?: 'MultirecipientFeeCollectOpenActionSettings';
       } & OpenActionModulesFields_MultirecipientFeeCollectOpenActionSettings_Fragment)
-    | ({
-        __typename?: 'ProtocolSharedRevenueCollectOpenActionSettings';
-      } & OpenActionModulesFields_ProtocolSharedRevenueCollectOpenActionSettings_Fragment)
     | ({
         __typename?: 'SimpleCollectOpenActionSettings';
       } & OpenActionModulesFields_SimpleCollectOpenActionSettings_Fragment)
@@ -7102,6 +7030,7 @@ export type ArticleMetadataV3FieldsFragment = {
   __typename?: 'ArticleMetadataV3';
   id: string;
   content: any;
+  tags?: Array<string> | null;
   attributes?: Array<
     { __typename?: 'MetadataAttribute' } & MetadataAttributeFieldsFragment
   > | null;
@@ -7123,6 +7052,7 @@ export type AudioMetadataV3FieldsFragment = {
   id: string;
   title: string;
   content: any;
+  tags?: Array<string> | null;
   attributes?: Array<
     { __typename?: 'MetadataAttribute' } & MetadataAttributeFieldsFragment
   > | null;
@@ -7146,6 +7076,7 @@ export type ImageMetadataV3FieldsFragment = {
   __typename?: 'ImageMetadataV3';
   id: string;
   content: any;
+  tags?: Array<string> | null;
   attributes?: Array<
     { __typename?: 'MetadataAttribute' } & MetadataAttributeFieldsFragment
   > | null;
@@ -7170,6 +7101,7 @@ export type LinkMetadataV3FieldsFragment = {
   id: string;
   content: any;
   sharingLink: any;
+  tags?: Array<string> | null;
   attributes?: Array<
     { __typename?: 'MetadataAttribute' } & MetadataAttributeFieldsFragment
   > | null;
@@ -7192,6 +7124,7 @@ export type LiveStreamMetadataV3FieldsFragment = {
   playbackURL: any;
   liveURL: any;
   content: any;
+  tags?: Array<string> | null;
   attributes?: Array<
     { __typename?: 'MetadataAttribute' } & MetadataAttributeFieldsFragment
   > | null;
@@ -7212,6 +7145,7 @@ export type MintMetadataV3FieldsFragment = {
   __typename?: 'MintMetadataV3';
   id: string;
   content: any;
+  tags?: Array<string> | null;
   attributes?: Array<
     { __typename?: 'MetadataAttribute' } & MetadataAttributeFieldsFragment
   > | null;
@@ -7232,6 +7166,7 @@ export type TextOnlyMetadataV3FieldsFragment = {
   __typename?: 'TextOnlyMetadataV3';
   id: string;
   content: any;
+  tags?: Array<string> | null;
   attributes?: Array<
     { __typename?: 'MetadataAttribute' } & MetadataAttributeFieldsFragment
   > | null;
@@ -7241,6 +7176,7 @@ export type VideoMetadataV3FieldsFragment = {
   __typename?: 'VideoMetadataV3';
   id: string;
   content: any;
+  tags?: Array<string> | null;
   attributes?: Array<
     { __typename?: 'MetadataAttribute' } & MetadataAttributeFieldsFragment
   > | null;
@@ -9162,15 +9098,15 @@ export type StaffPicksQuery = {
   __typename?: 'Query';
   batch1: {
     __typename?: 'PaginatedProfileResult';
-    items: Array<{ __typename?: 'Profile' } & ProfileFieldsFragment>;
+    items: Array<{ __typename?: 'Profile' } & ListProfileFieldsFragment>;
   };
   batch2: {
     __typename?: 'PaginatedProfileResult';
-    items: Array<{ __typename?: 'Profile' } & ProfileFieldsFragment>;
+    items: Array<{ __typename?: 'Profile' } & ListProfileFieldsFragment>;
   };
   batch3: {
     __typename?: 'PaginatedProfileResult';
-    items: Array<{ __typename?: 'Profile' } & ProfileFieldsFragment>;
+    items: Array<{ __typename?: 'Profile' } & ListProfileFieldsFragment>;
   };
 };
 
@@ -9202,12 +9138,6 @@ export type UserRateLimitQuery = {
     };
   };
 };
-
-export type VerifyQueryVariables = Exact<{
-  request: VerifyRequest;
-}>;
-
-export type VerifyQuery = { __typename?: 'Query'; verify: boolean };
 
 export type WhoActedOnPublicationQueryVariables = Exact<{
   request: WhoActedOnPublicationRequest;
@@ -9504,6 +9434,7 @@ export const VideoMetadataV3FieldsFragmentDoc = gql`
   fragment VideoMetadataV3Fields on VideoMetadataV3 {
     id
     content
+    tags
     attributes {
       ...MetadataAttributeFields
     }
@@ -9522,6 +9453,7 @@ export const ArticleMetadataV3FieldsFragmentDoc = gql`
   fragment ArticleMetadataV3Fields on ArticleMetadataV3 {
     id
     content
+    tags
     attributes {
       ...MetadataAttributeFields
     }
@@ -9537,6 +9469,7 @@ export const AudioMetadataV3FieldsFragmentDoc = gql`
     id
     title
     content
+    tags
     attributes {
       ...MetadataAttributeFields
     }
@@ -9555,6 +9488,7 @@ export const ImageMetadataV3FieldsFragmentDoc = gql`
   fragment ImageMetadataV3Fields on ImageMetadataV3 {
     id
     content
+    tags
     attributes {
       ...MetadataAttributeFields
     }
@@ -9574,6 +9508,7 @@ export const LinkMetadataV3FieldsFragmentDoc = gql`
     id
     content
     sharingLink
+    tags
     attributes {
       ...MetadataAttributeFields
     }
@@ -9590,6 +9525,7 @@ export const LiveStreamMetadataV3FieldsFragmentDoc = gql`
     playbackURL
     liveURL
     content
+    tags
     attributes {
       ...MetadataAttributeFields
     }
@@ -9604,6 +9540,7 @@ export const MintMetadataV3FieldsFragmentDoc = gql`
   fragment MintMetadataV3Fields on MintMetadataV3 {
     id
     content
+    tags
     attributes {
       ...MetadataAttributeFields
     }
@@ -9618,6 +9555,7 @@ export const TextOnlyMetadataV3FieldsFragmentDoc = gql`
   fragment TextOnlyMetadataV3Fields on TextOnlyMetadataV3 {
     id
     content
+    tags
     attributes {
       ...MetadataAttributeFields
     }
@@ -16739,21 +16677,21 @@ export const StaffPicksDocument = gql`
   ) {
     batch1: profiles(request: { where: { profileIds: $batch1 } }) {
       items {
-        ...ProfileFields
+        ...ListProfileFields
       }
     }
     batch2: profiles(request: { where: { profileIds: $batch2 } }) {
       items {
-        ...ProfileFields
+        ...ListProfileFields
       }
     }
     batch3: profiles(request: { where: { profileIds: $batch3 } }) {
       items {
-        ...ProfileFields
+        ...ListProfileFields
       }
     }
   }
-  ${ProfileFieldsFragmentDoc}
+  ${ListProfileFieldsFragmentDoc}
 `;
 
 /**
@@ -16912,68 +16850,6 @@ export type UserRateLimitSuspenseQueryHookResult = ReturnType<
 export type UserRateLimitQueryResult = Apollo.QueryResult<
   UserRateLimitQuery,
   UserRateLimitQueryVariables
->;
-export const VerifyDocument = gql`
-  query Verify($request: VerifyRequest!) {
-    verify(request: $request)
-  }
-`;
-
-/**
- * __useVerifyQuery__
- *
- * To run a query within a React component, call `useVerifyQuery` and pass it any options that fit your needs.
- * When your component renders, `useVerifyQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useVerifyQuery({
- *   variables: {
- *      request: // value for 'request'
- *   },
- * });
- */
-export function useVerifyQuery(
-  baseOptions: Apollo.QueryHookOptions<VerifyQuery, VerifyQueryVariables> &
-    ({ variables: VerifyQueryVariables; skip?: boolean } | { skip: boolean })
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<VerifyQuery, VerifyQueryVariables>(
-    VerifyDocument,
-    options
-  );
-}
-export function useVerifyLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<VerifyQuery, VerifyQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<VerifyQuery, VerifyQueryVariables>(
-    VerifyDocument,
-    options
-  );
-}
-export function useVerifySuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    VerifyQuery,
-    VerifyQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<VerifyQuery, VerifyQueryVariables>(
-    VerifyDocument,
-    options
-  );
-}
-export type VerifyQueryHookResult = ReturnType<typeof useVerifyQuery>;
-export type VerifyLazyQueryHookResult = ReturnType<typeof useVerifyLazyQuery>;
-export type VerifySuspenseQueryHookResult = ReturnType<
-  typeof useVerifySuspenseQuery
->;
-export type VerifyQueryResult = Apollo.QueryResult<
-  VerifyQuery,
-  VerifyQueryVariables
 >;
 export const WhoActedOnPublicationDocument = gql`
   query WhoActedOnPublication($request: WhoActedOnPublicationRequest!) {
@@ -17337,7 +17213,6 @@ const result: PossibleTypesResultData = {
       'LegacySimpleCollectModuleSettings',
       'LegacyTimedFeeCollectModuleSettings',
       'MultirecipientFeeCollectOpenActionSettings',
-      'ProtocolSharedRevenueCollectOpenActionSettings',
       'SimpleCollectOpenActionSettings',
       'UnknownOpenActionModuleSettings'
     ],

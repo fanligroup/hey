@@ -47,7 +47,7 @@ module.exports = {
       },
       {
         destination:
-          'https://explorer.gitcoin.co/#/round/42161/25/1?utm_source=hey.xyz',
+          'https://explorer.gitcoin.co/#/round/10/44/14?utm_source=hey.xyz',
         permanent: true,
         source: '/gitcoin'
       },
@@ -73,18 +73,24 @@ module.exports = {
           'https://yoginth.notion.site/ff1926a080fa44bc9d40ee534f627949',
         permanent: true,
         source: '/-/mod-guide'
+      },
+      // Redirect: hey.xyz/u/lens/<localname> > hey.xyz/u/<localname>
+      {
+        destination: '/u/:handle',
+        permanent: true,
+        source: '/u/:namespace/:handle'
       }
     ];
   },
   rewrites() {
     return [
       {
-        destination: `${process.env.NEXT_PUBLIC_OG_URL}/u/:match*`,
+        destination: 'https://og.hey.xyz/u/:match*',
         has: [{ key: 'user-agent', type: 'header', value: allowedBots }],
         source: '/u/:match*'
       },
       {
-        destination: `${process.env.NEXT_PUBLIC_OG_URL}/posts/:match*`,
+        destination: 'https://og.hey.xyz/posts/:match*',
         has: [{ key: 'user-agent', type: 'header', value: allowedBots }],
         source: '/posts/:match*'
       }

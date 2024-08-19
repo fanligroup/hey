@@ -44,12 +44,13 @@ const getFrame = (document: Document, url?: string): Frame | null => {
   }
 
   // Frame must contain valid elements
-  if (!postUrl || !image || buttons.length === 0) {
+  if (!postUrl || !image) {
     return null;
   }
 
   return {
-    authenticated: !acceptsAnonymous,
+    acceptsAnonymous: Boolean(acceptsAnonymous),
+    acceptsLens: Boolean(lensFramesVersion),
     buttons,
     frameUrl,
     image,

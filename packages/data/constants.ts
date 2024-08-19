@@ -4,14 +4,13 @@ import getEnvConfig from './utils/getEnvConfig';
 
 // Environments
 export const IS_PRODUCTION = process.env.NEXT_PUBLIC_IS_PRODUCTION === 'true';
-export const IS_PREVIEW = process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
 
 // Lens and Hey Env Config
 export const LENS_NETWORK = process.env.NEXT_PUBLIC_LENS_NETWORK || 'mainnet';
 
 export const LENS_API_URL = getEnvConfig().lensApiEndpoint;
 export const HEY_API_URL = IS_PRODUCTION
-  ? getEnvConfig().heyApiEndpoint
+  ? 'https://api.hey.xyz'
   : 'http://localhost:4784';
 export const LENS_HUB = getEnvConfig().lensHub;
 export const LENS_HANDLES = getEnvConfig().lensHandles;
@@ -59,7 +58,6 @@ export const HEY_MEMBERSHIP_NFT = IS_MAINNET
   ? '0x100372BBF7f975f6b1448fB11AB0F814b2740EEd'
   : '0x75120677aBF34ae95a916C6E9DbB610a06536CC3';
 export const HEY_MEMBERSHIP_NFT_PUBLICATION_ID = '0x020b69-0x01';
-export const SUPER_ADMIN = '0x0d';
 export const DEFAULT_DECENT_OA_TOKEN = {
   contractAddress: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
   decimals: 18,
@@ -102,6 +100,7 @@ export const MOONPAY_URL = IS_MAINNET
   ? 'https://buy.moonpay.com'
   : 'https://buy-sandbox.moonpay.com';
 export const HEY_IMAGEKIT_URL = 'https://ik.imagekit.io/lensterimg';
+export const CLUBS_API_URL = 'https://us-central1-orbapp.cloudfunctions.net';
 
 // Tokens / Keys
 export const WALLETCONNECT_PROJECT_ID = 'cd542acc70c2b548030f9901a52e70c8';
@@ -109,7 +108,8 @@ export const GIPHY_KEY = 'yNwCXMKkiBrxyyFduF56xCbSuJJM8cMd';
 export const GITCOIN_PASSPORT_KEY = 'xn9e7AFv.aEfS0ioNhaVtww1jdwnsWtxnrNHspVsS';
 export const LIVEPEER_KEY = '70508bf8-2e16-4594-852d-5aed798f6403';
 export const ALCHEMY_API_KEY = 'Xx-4a1SyWtS9U4h0cEuRmvgYtGeVOlv7';
-export const THIRDWEB_CLIENT_ID = '0e8fa22aa33b3da60c593b4864a2e2d1';
+export const CLUBS_APP_TOKEN =
+  'Qun7aDFo4FS7Dt2b9Ea8ve5TqvuXiCJXjZZTsao5Y9viFJxSEi5gYZa7DybrSzDGXST5L2vWMjBXzjsppj5RERo3AdPnJ3TVYuY2cLxBFa592rkjzU';
 
 // Named transforms for ImageKit
 export const AVATAR = 'tr:w-350,h-350';
@@ -123,15 +123,10 @@ export const S3_BUCKET = {
   HEY_MEDIA: 'hey-media'
 };
 
-// Feature Flags
-export const VERIFIED_FEATURE_ID = 'a0d6d247-50ef-419f-a045-54fa96054922';
-export const STAFF_PICK_FEATURE_ID = '73d2f48d-0291-4a36-adc2-9737057ad2b7';
-
 // Known Lens Protocol Attributes
 export const KNOWN_ATTRIBUTES = {
   HIDE_OEMBED: 'hideOembed',
-  POLL_ID: 'pollId',
-  SWAP_OA_DEFAULT_AMOUNT: 'swapOADefaultAmount'
+  POLL_ID: 'heyPollId'
 };
 
 // Tanstack Stale Times

@@ -1,14 +1,29 @@
-import type { Handler } from 'express';
+import type { Request, Response } from 'express';
 
+import lensPg from '@hey/db/lensPg';
+import { getRedis, setRedis } from '@hey/db/redisClient';
 import logger from '@hey/helpers/logger';
-import lensPg from 'src/db/lensPg';
 import catchedError from 'src/helpers/catchedError';
-import { SWR_CACHE_AGE_10_SECS_30_DAYS } from 'src/helpers/constants';
+import { CACHE_AGE_30_MINS } from 'src/helpers/constants';
+import { rateLimiter } from 'src/helpers/middlewares/rateLimiter';
 
 // TODO: add tests
-export const get: Handler = async (req, res) => {
-  try {
-    const response = await lensPg.query(`
+export const get = [
+  rateLimiter({ requests: 250, within: 1 }),
+  async (_: Request, res: Response) => {
+    try {
+      const cacheKey = 'rates';
+      const cachedData = await getRedis(cacheKey);
+
+      if (cachedData) {
+        logger.info('(cached) [Lens] Fetched USD conversion rates');
+        return res
+          .status(200)
+          .setHeader('Cache-Control', CACHE_AGE_30_MINS)
+          .json({ result: JSON.parse(cachedData), success: true });
+      }
+
+      const response = await lensPg.query(`
       SELECT ec.name AS name,
         ec.symbol AS symbol,
         ec.decimals AS decimals,
@@ -19,21 +34,23 @@ export const get: Handler = async (req, res) => {
       WHERE fc.fiatsymbol = 'usd';
     `);
 
-    const result = response.map((row: any) => ({
-      address: row.address.toLowerCase(),
-      decimals: row.decimals,
-      fiat: Number(row.fiat),
-      name: row.name,
-      symbol: row.symbol
-    }));
+      const result = response.map((row: any) => ({
+        address: row.address.toLowerCase(),
+        decimals: row.decimals,
+        fiat: Number(row.fiat),
+        name: row.name,
+        symbol: row.symbol
+      }));
 
-    logger.info('Lens: Fetched USD conversion rates');
+      await setRedis(cacheKey, result);
+      logger.info('[Lens] Fetched USD conversion rates');
 
-    return res
-      .status(200)
-      .setHeader('Cache-Control', SWR_CACHE_AGE_10_SECS_30_DAYS)
-      .json({ result, success: true });
-  } catch (error) {
-    catchedError(res, error);
+      return res
+        .status(200)
+        .setHeader('Cache-Control', CACHE_AGE_30_MINS)
+        .json({ result, success: true });
+    } catch (error) {
+      catchedError(res, error);
+    }
   }
-};
+];

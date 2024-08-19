@@ -3,6 +3,7 @@ import type { FC } from 'react';
 import NotificationIcon from '@components/Notification/NotificationIcon';
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { STATIC_IMAGES_URL } from '@hey/data/constants';
+import { H6 } from '@hey/ui';
 import cn from '@hey/ui/cn';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -15,7 +16,6 @@ import MessagesIcon from './MessagesIcon';
 import ModIcon from './ModIcon';
 import MoreNavItems from './MoreNavItems';
 import Search from './Search';
-import SiteStatus from './SiteStatus';
 import StaffBar from './StaffBar';
 
 const Navbar: FC = () => {
@@ -33,7 +33,7 @@ const Navbar: FC = () => {
     return (
       <Link
         className={cn(
-          'cursor-pointer rounded-md px-2 py-1 text-left text-sm font-bold tracking-wide md:px-3',
+          'cursor-pointer rounded-md px-2 py-1 text-left tracking-wide md:px-3',
           {
             'bg-gray-200 text-black dark:bg-gray-800 dark:text-white': current,
             'text-gray-700 hover:bg-gray-200 hover:text-black dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white':
@@ -42,7 +42,7 @@ const Navbar: FC = () => {
         )}
         href={url}
       >
-        {name}
+        <H6>{name}</H6>
       </Link>
     );
   };
@@ -65,7 +65,6 @@ const Navbar: FC = () => {
 
   return (
     <header className="divider sticky top-0 z-10 w-full bg-white dark:bg-black">
-      <SiteStatus />
       <StaffBar />
       <div className="container mx-auto max-w-screen-xl px-5">
         <div className="relative flex h-14 items-center justify-between sm:h-16">

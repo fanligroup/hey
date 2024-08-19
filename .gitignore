@@ -30,12 +30,6 @@ yarn-error.log*
 .env.production.local
 .env
 
-# turbo
-.turbo
-
-# vercel
-.vercel
-
 # typescript
 *.tsbuildinfo
 

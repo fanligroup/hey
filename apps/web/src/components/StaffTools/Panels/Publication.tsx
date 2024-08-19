@@ -2,10 +2,10 @@ import type { MirrorablePublication } from '@hey/lens';
 import type { FC } from 'react';
 
 import MetaDetails from '@components/Shared/MetaDetails';
-import { HashtagIcon, RectangleStackIcon } from '@heroicons/react/24/outline';
+import { HashtagIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import { ShieldCheckIcon } from '@heroicons/react/24/solid';
 import { isCommentPublication } from '@hey/helpers/publicationHelpers';
-import { Card } from '@hey/ui';
+import { Card, H5 } from '@hey/ui';
 
 interface PublicationStaffToolProps {
   publication: MirrorablePublication;
@@ -24,7 +24,7 @@ const PublicationStaffTool: FC<PublicationStaffToolProps> = ({
     >
       <div className="flex items-center space-x-2 text-yellow-600">
         <ShieldCheckIcon className="size-5" />
-        <div className="text-lg font-bold">Staff tool</div>
+        <H5>Staff tool</H5>
       </div>
       <div className="mt-3 space-y-2">
         <MetaDetails
@@ -45,7 +45,7 @@ const PublicationStaffTool: FC<PublicationStaffToolProps> = ({
         ) : null}
         {publication?.openActionModules?.length ? (
           <MetaDetails
-            icon={<RectangleStackIcon className="ld-text-gray-500 size-4" />}
+            icon={<ShoppingBagIcon className="ld-text-gray-500 size-4" />}
             noFlex
             title="Open action modules"
           >

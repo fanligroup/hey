@@ -1,7 +1,7 @@
-import { GIT_COMMIT_SHA, HEY_API_URL } from '@hey/data/constants';
+import { HEY_API_URL } from '@hey/data/constants';
 import { Localstorage } from '@hey/data/storage';
 
-import getAuthApiHeaders from './getAuthApiHeaders';
+import { getAuthApiHeadersWithAccessToken } from './getAuthApiHeaders';
 
 let worker: Worker;
 
@@ -19,15 +19,13 @@ export const Leafwatch = {
     const fingerprint = localStorage.getItem(Localstorage.FingerprintStore);
 
     worker.postMessage({
-      accessToken: getAuthApiHeaders()['X-Identity-Token'] || undefined,
       fingerprint: fingerprint || undefined,
+      identityToken:
+        getAuthApiHeadersWithAccessToken()['X-Identity-Token'] || undefined,
       name,
-      network: getAuthApiHeaders()['X-Lens-Network'] || undefined,
-      platform: 'web',
       properties,
       referrer: referrerDomain,
-      url: window.location.href,
-      version: GIT_COMMIT_SHA
+      url: window.location.href
     });
 
     worker.onmessage = (event: MessageEvent) => {
@@ -35,7 +33,7 @@ export const Leafwatch = {
       const xhr = new XMLHttpRequest();
       xhr.open('POST', `${HEY_API_URL}/leafwatch/events`);
       xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.setRequestHeader('x-identity-token', response.accessToken);
+      xhr.setRequestHeader('x-identity-token', response.identityToken);
       xhr.send(JSON.stringify(response));
     };
   }

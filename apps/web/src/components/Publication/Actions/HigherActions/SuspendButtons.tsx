@@ -1,7 +1,7 @@
 import type { MirrorablePublication } from '@hey/lens';
 import type { FC } from 'react';
 
-import getAuthApiHeaders from '@helpers/getAuthApiHeaders';
+import { getAuthApiHeaders } from '@helpers/getAuthApiHeaders';
 import { ChatBubbleLeftIcon, NoSymbolIcon } from '@heroicons/react/24/outline';
 import { HEY_API_URL } from '@hey/data/constants';
 import { Button } from '@hey/ui';
@@ -45,7 +45,6 @@ const SuspendButtons: FC<SuspendButtonsProps> = ({ onClick, publication }) => {
         onClick={() =>
           updateFeatureFlag('8ed8b26a-279d-4111-9d39-a40164b273a0')
         }
-        outline
         size="sm"
         variant="danger"
       >
@@ -57,7 +56,6 @@ const SuspendButtons: FC<SuspendButtonsProps> = ({ onClick, publication }) => {
         onClick={() =>
           updateFeatureFlag('df931ea4-109f-4fde-a8b5-4b2170730e8c')
         }
-        outline
         size="sm"
         variant="danger"
       >

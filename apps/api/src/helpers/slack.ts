@@ -1,4 +1,5 @@
 import { BRAND_COLOR } from '@hey/data/constants';
+import logger from '@hey/helpers/logger';
 import axios from 'axios';
 
 const SLACK_CHANNELS = [
@@ -25,6 +26,10 @@ const sendSlackMessage = async ({
   }[];
   text: string;
 }): Promise<void> => {
+  if (!process.env.SLACK_WEBHOOK_URL) {
+    return logger.error('Slack webhook URL not set');
+  }
+
   return await axios.post(
     `${process.env.SLACK_WEBHOOK_URL}/${getChannelId(channel)}`,
     { channel, color, fallback: text, fields, pretext: text }

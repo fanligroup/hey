@@ -1,48 +1,42 @@
-import type { Request } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 
+import { Errors } from '@hey/data';
+import prisma from '@hey/db/prisma/db/client';
 import parseJwt from '@hey/helpers/parseJwt';
-import heyPg from 'src/db/heyPg';
 
-import { STAFF_FEATURE_ID } from '../constants';
-import validateLensAccount from './validateLensAccount';
+import catchedError from '../catchedError';
 
 /**
  * Middleware to validate if the profile is staff
- * @param request Incoming request
- * @returns Response
+ * @param req Incoming request
+ * @param res Response
+ * @param next Next function
  */
-const validateIsStaff = async (request: Request) => {
-  const validateLensAccountStatus = await validateLensAccount(request);
-  if (validateLensAccountStatus !== 200) {
-    return validateLensAccountStatus;
-  }
-
-  const identityToken = request.headers['x-identity-token'] as string;
+const validateIsStaff = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const identityToken = req.headers['x-identity-token'] as string;
   if (!identityToken) {
-    return 400;
+    return catchedError(res, new Error(Errors.Unauthorized), 401);
   }
 
   try {
     const payload = parseJwt(identityToken);
-    const data = await heyPg.query(
-      `
-        SELECT enabled
-        FROM "ProfileFeature"
-        WHERE enabled = TRUE
-        AND "featureId" = $1
-        AND "profileId" = $2
-        LIMIT 1;
-      `,
-      [STAFF_FEATURE_ID, payload.id]
-    );
 
-    if (data[0]?.enabled) {
-      return 200;
+    const data = await prisma.profileFeature.findFirst({
+      include: { feature: { select: { key: true } } },
+      where: { enabled: true, profileId: payload.id }
+    });
+
+    if (data?.enabled) {
+      return next();
     }
 
-    return 401;
+    return catchedError(res, new Error(Errors.Unauthorized), 401);
   } catch {
-    return 500;
+    return catchedError(res, new Error(Errors.SomethingWentWrong));
   }
 };
 

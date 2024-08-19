@@ -1,9 +1,13 @@
 import type { Handler } from 'express';
 
+import lensPg from '@hey/db/lensPg';
 import logger from '@hey/helpers/logger';
-import lensPg from 'src/db/lensPg';
 import catchedError from 'src/helpers/catchedError';
-import { SITEMAP_BATCH_SIZE } from 'src/helpers/constants';
+import {
+  CACHE_AGE_1_DAY,
+  CACHE_AGE_INDEFINITE,
+  SITEMAP_BATCH_SIZE
+} from 'src/helpers/constants';
 import { noBody } from 'src/helpers/responses';
 import { buildUrlsetXml } from 'src/helpers/sitemap/buildSitemap';
 
@@ -12,16 +16,16 @@ export const config = {
 };
 
 export const get: Handler = async (req, res) => {
-  const batch = req.path.replace('/sitemap/profiles/', '');
+  const { id } = req.params;
 
-  if (!batch) {
+  if (!id) {
     return noBody(res);
   }
 
   const user_agent = req.headers['user-agent'];
 
   try {
-    const offset = (Number(batch) - 1) * SITEMAP_BATCH_SIZE || 0;
+    const offset = (Number(id) - 1) * SITEMAP_BATCH_SIZE || 0;
 
     const response = await lensPg.query(
       `
@@ -49,10 +53,19 @@ export const get: Handler = async (req, res) => {
     const xml = buildUrlsetXml(entries);
 
     logger.info(
-      `Lens: Fetched profiles sitemap for batch ${batch} having ${response.length} entries from user-agent: ${user_agent}`
+      `[Lens] Fetched profiles sitemap for batch ${id} having ${response.length} entries from user-agent: ${user_agent}`
     );
-
-    return res.status(200).setHeader('Content-Type', 'text/xml').send(xml);
+    console.log(response.length === SITEMAP_BATCH_SIZE);
+    return res
+      .status(200)
+      .setHeader('Content-Type', 'text/xml')
+      .setHeader(
+        'Cache-Control',
+        response.length === SITEMAP_BATCH_SIZE
+          ? CACHE_AGE_INDEFINITE
+          : CACHE_AGE_1_DAY
+      )
+      .send(xml);
   } catch (error) {
     return catchedError(res, error);
   }

@@ -1,12 +1,12 @@
 import type { Handler } from 'express';
 
 import LensEndpoint from '@hey/data/lens-endpoints';
+import clickhouseClient from '@hey/db/clickhouseClient';
 import logger from '@hey/helpers/logger';
 import axios from 'axios';
 import invoiceRates from 'src/data/invoice-rates';
 import catchedError from 'src/helpers/catchedError';
 import { HEY_USER_AGENT } from 'src/helpers/constants';
-import createClickhouseClient from 'src/helpers/createClickhouseClient';
 import { noBody } from 'src/helpers/responses';
 
 const getRateForTimestamp = (timestamp: number): number | undefined => {
@@ -31,18 +31,15 @@ export const get: Handler = async (req, res) => {
   }
 
   try {
-    const client = createClickhouseClient();
-
     const [rows, lensResponse] = await Promise.all([
-      client.query({
+      clickhouseClient.query({
         format: 'JSONEachRow',
         query: `
-          SELECT city, region, country
+          SELECT city, country
           FROM events
           WHERE 
             actor = '${id}'
             AND city IS NOT NULL
-            AND region IS NOT NULL
             AND country IS NOT NULL
           ORDER BY created ASC
           LIMIT 1;
@@ -80,7 +77,6 @@ export const get: Handler = async (req, res) => {
       city: string;
       country: string;
       created: string;
-      region: string;
     }>();
 
     const lensData = lensResponse.data;
@@ -98,10 +94,8 @@ export const get: Handler = async (req, res) => {
 
     const result = {
       address:
-        leafwatchData[0]?.city &&
-        leafwatchData[0]?.region &&
-        leafwatchData[0]?.country
-          ? `${leafwatchData[0].city}, ${leafwatchData[0].region}, ${leafwatchData[0].country}`
+        leafwatchData[0]?.city && leafwatchData[0]?.country
+          ? `${leafwatchData[0].city}, ${leafwatchData[0].country}`
           : 'Others',
       ...lensProfile,
       rate: rate || 600

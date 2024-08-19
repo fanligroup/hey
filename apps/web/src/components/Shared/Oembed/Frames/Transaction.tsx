@@ -1,15 +1,15 @@
-import type { FrameTransaction, Frame as IFrame } from '@hey/types/misc';
-import type { Dispatch, FC, SetStateAction } from 'react';
+import type { Frame as IFrame } from '@hey/types/misc';
+import type { FC } from 'react';
 
 import errorToast from '@helpers/errorToast';
-import getAuthApiHeaders from '@helpers/getAuthApiHeaders';
+import { getAuthApiHeadersWithAccessToken } from '@helpers/getAuthApiHeaders';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { Errors } from '@hey/data';
 import { HEY_API_URL } from '@hey/data/constants';
 import formatAddress from '@hey/helpers/formatAddress';
 import getNftChainId from '@hey/helpers/getNftChainId';
 import getNftChainInfo from '@hey/helpers/getNftChainInfo';
-import { Button } from '@hey/ui';
+import { Button, H4 } from '@hey/ui';
 import axios from 'axios';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -25,6 +25,8 @@ import {
 } from 'viem/chains';
 import { useSendTransaction, useSwitchChain } from 'wagmi';
 
+import { useFramesStore } from '.';
+
 const SUPPORTED_CHAINS = [
   polygon.id,
   polygonAmoy.id,
@@ -37,30 +39,12 @@ const SUPPORTED_CHAINS = [
 
 interface TransactionProps {
   publicationId?: string;
-  setFrameData: Dispatch<SetStateAction<IFrame | null>>;
-  setShowTransaction: Dispatch<
-    SetStateAction<{
-      frame: IFrame | null;
-      index: number;
-      show: boolean;
-      transaction: FrameTransaction | null;
-    }>
-  >;
-  showTransaction: {
-    frame: IFrame | null;
-    index: number;
-    show: boolean;
-    transaction: FrameTransaction | null;
-  };
 }
 
-const Transaction: FC<TransactionProps> = ({
-  publicationId,
-  setFrameData,
-  setShowTransaction,
-  showTransaction
-}) => {
+const Transaction: FC<TransactionProps> = ({ publicationId }) => {
   const { currentProfile } = useProfileStore();
+  const { setFrameData, setShowTransaction, showTransaction } =
+    useFramesStore();
   const [isLoading, setIsLoading] = useState(false);
   const [txnHash, setTxnHash] = useState<`0x${string}` | null>(null);
   const { switchChainAsync } = useSwitchChain();
@@ -95,7 +79,7 @@ const Transaction: FC<TransactionProps> = ({
       const hash = await sendTransactionAsync({
         data: txnData.params.data,
         to: txnData.params.to,
-        value: BigInt(txnData.params.value)
+        value: BigInt(txnData.params.value || 0)
       });
 
       setTxnHash(hash);
@@ -104,13 +88,16 @@ const Transaction: FC<TransactionProps> = ({
         await axios.post(
           `${HEY_API_URL}/frames/post`,
           {
+            acceptsAnonymous: showTransaction.frame?.acceptsAnonymous,
+            acceptsLens: showTransaction.frame?.acceptsLens,
+            actionResponse: hash,
             buttonIndex: +1,
             postUrl:
               showTransaction.frame?.buttons[showTransaction.index].postUrl ||
               showTransaction.frame?.postUrl,
             pubId: publicationId
           },
-          { headers: getAuthApiHeaders() }
+          { headers: getAuthApiHeadersWithAccessToken() }
         );
 
       if (!postedData.frame) {
@@ -128,7 +115,7 @@ const Transaction: FC<TransactionProps> = ({
   if (txnHash) {
     return (
       <div className="m-8 flex flex-col items-center justify-center">
-        <div className="text-xl font-bold">Transaction Sent</div>
+        <H4>Transaction Sent</H4>
         <div className="ld-text-gray-500 mt-3 text-center font-semibold">
           Your transaction will confirm shortly.
         </div>

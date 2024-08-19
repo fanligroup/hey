@@ -5,18 +5,14 @@ import axios from 'axios';
 
 /**
  * Get profile preferences
- * @param id profile id
  * @param headers auth headers
  * @returns profile preferences
  */
-const getPreferences = async (
-  id: string,
-  headers: any
-): Promise<Preferences> => {
+const getPreferences = async (headers: any): Promise<Preferences> => {
   try {
     const response: { data: { result: Preferences } } = await axios.get(
       `${HEY_API_URL}/preferences/get`,
-      { headers, params: { id } }
+      { headers }
     );
 
     return response.data.result;

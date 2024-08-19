@@ -1,20 +1,16 @@
 import type { FiatRate } from '@hey/types/lens';
 import type { FC } from 'react';
 
-import getAuthApiHeaders from '@helpers/getAuthApiHeaders';
+import { getAuthApiHeaders } from '@helpers/getAuthApiHeaders';
 import getCurrentSession from '@helpers/getCurrentSession';
 import { HEY_API_URL, STALE_TIMES } from '@hey/data/constants';
 import { FeatureFlag } from '@hey/data/feature-flags';
 import getAllTokens from '@hey/helpers/api/getAllTokens';
 import getPreferences from '@hey/helpers/api/getPreferences';
-import getProfileDetails from '@hey/helpers/api/getProfileFlags';
-import getScore from '@hey/helpers/api/getScore';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { usePreferencesStore } from 'src/store/non-persisted/usePreferencesStore';
-import { useProfileDetailsStore } from 'src/store/non-persisted/useProfileDetailsStore';
 import { useProfileStatus } from 'src/store/non-persisted/useProfileStatus';
-import { useScoreStore } from 'src/store/non-persisted/useScoreStore';
 import { useAllowedTokensStore } from 'src/store/persisted/useAllowedTokensStore';
 import { useFeatureFlagsStore } from 'src/store/persisted/useFeatureFlagsStore';
 import { useRatesStore } from 'src/store/persisted/useRatesStore';
@@ -25,7 +21,6 @@ const PreferencesProvider: FC = () => {
   const { setVerifiedMembers } = useVerifiedMembersStore();
   const { setAllowedTokens } = useAllowedTokensStore();
   const { setFiatRates } = useRatesStore();
-  const { setScore } = useScoreStore();
   const {
     setAppIcon,
     setEmail,
@@ -33,15 +28,11 @@ const PreferencesProvider: FC = () => {
     setHasDismissedOrMintedMembershipNft,
     setHighSignalNotificationFilter
   } = usePreferencesStore();
-  const { setPinnedPublication } = useProfileDetailsStore();
   const { setStatus } = useProfileStatus();
   const { setFeatureFlags, setStaffMode } = useFeatureFlagsStore();
 
   const getPreferencesData = async () => {
-    const preferences = await getPreferences(
-      sessionProfileId,
-      getAuthApiHeaders()
-    );
+    const preferences = await getPreferences(getAuthApiHeaders());
 
     setHighSignalNotificationFilter(preferences.highSignalNotificationFilter);
     setAppIcon(preferences.appIcon);
@@ -60,18 +51,6 @@ const PreferencesProvider: FC = () => {
     );
 
     return true;
-  };
-
-  const getProfileDetailsData = async () => {
-    const details = await getProfileDetails(sessionProfileId);
-    setPinnedPublication(details?.pinnedPublication || null);
-    return true;
-  };
-
-  const getScoreData = async () => {
-    const score = await getScore(sessionProfileId);
-    setScore(score.score);
-    return score;
   };
 
   const getVerifiedMembersData = async () => {
@@ -103,17 +82,6 @@ const PreferencesProvider: FC = () => {
     enabled: Boolean(sessionProfileId),
     queryFn: getPreferencesData,
     queryKey: ['getPreferences', sessionProfileId || '']
-  });
-  useQuery({
-    enabled: Boolean(sessionProfileId),
-    queryFn: getProfileDetailsData,
-    queryKey: ['getProfileDetails', sessionProfileId || '']
-  });
-  useQuery({
-    enabled: Boolean(sessionProfileId),
-    queryFn: getScoreData,
-    queryKey: ['getScore', sessionProfileId],
-    staleTime: STALE_TIMES.SIX_HOURS
   });
   useQuery({
     queryFn: getVerifiedMembersData,

@@ -14,11 +14,6 @@ const getAllowanceOpenAction = (
   name: string;
 } => {
   switch (address) {
-    case VerifiedOpenActionModules.Swap:
-      return { name: 'Swap Open Action' };
-    case VerifiedOpenActionModules.RentableBillboard:
-      return { name: 'Rentable Billboard' };
-
     case VerifiedOpenActionModules.DecentNFT:
       return { name: 'NFT Mint Open Action' };
 

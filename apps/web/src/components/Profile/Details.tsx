@@ -28,7 +28,7 @@ import getProfile from '@hey/helpers/getProfile';
 import getProfileAttribute from '@hey/helpers/getProfileAttribute';
 import hasMisused from '@hey/helpers/hasMisused';
 import { FollowModuleType } from '@hey/lens';
-import { Button, Image, LightBox, Tooltip } from '@hey/ui';
+import { Button, H3, Image, LightBox, Tooltip } from '@hey/ui';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -44,7 +44,6 @@ import InternalTools from './InternalTools';
 import ProfileMenu from './Menu';
 import MutualFollowers from './MutualFollowers';
 import ScamWarning from './ScamWarning';
-import Score from './Score';
 
 export const MetaDetails = ({
   children,
@@ -79,7 +78,7 @@ const Details: FC<DetailsProps> = ({ isSuspended = false, profile }) => {
       <div className="relative -mt-24 size-32 sm:-mt-32 sm:size-52">
         <Image
           alt={profile.id}
-          className="size-32 cursor-pointer rounded-xl bg-gray-200 ring-8 ring-gray-50 sm:size-52 dark:bg-gray-700 dark:ring-black"
+          className="size-32 cursor-pointer rounded-full bg-gray-200 ring-8 ring-gray-50 sm:size-52 dark:bg-gray-700 dark:ring-black"
           height={128}
           onClick={() => setExpandedImage(getAvatar(profile, EXPANDED_AVATAR))}
           onError={({ currentTarget }) => {
@@ -95,8 +94,8 @@ const Details: FC<DetailsProps> = ({ isSuspended = false, profile }) => {
         />
       </div>
       <div className="space-y-1 py-2">
-        <div className="flex items-center gap-1.5 text-2xl font-bold">
-          <div className="truncate">{getProfile(profile).displayName}</div>
+        <div className="flex items-center gap-1.5">
+          <H3 className="truncate">{getProfile(profile).displayName}</H3>
           {isVerified(profile.id) ? (
             <Tooltip content="Verified">
               <CheckBadgeIcon className="text-brand-500 size-6" />
@@ -142,7 +141,6 @@ const Details: FC<DetailsProps> = ({ isSuspended = false, profile }) => {
               icon={<Cog6ToothIcon className="size-5" />}
               onClick={() => push('/settings')}
               outline
-              variant="secondary"
             >
               Edit Profile
             </Button>
@@ -174,7 +172,6 @@ const Details: FC<DetailsProps> = ({ isSuspended = false, profile }) => {
           <MetaDetails icon={<HashtagIcon className="size-4" />}>
             {parseInt(profile.id)}
           </MetaDetails>
-          <Score id={profile.id} />
           {getProfileAttribute('location', profile?.metadata?.attributes) ? (
             <MetaDetails icon={<MapPinIcon className="size-4" />}>
               {getProfileAttribute('location', profile?.metadata?.attributes)}

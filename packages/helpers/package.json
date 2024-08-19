@@ -12,23 +12,23 @@
     "typecheck": "tsc --pretty"
   },
   "dependencies": {
-    "@apollo/client": "^3.10.8",
-    "@axiomhq/winston": "^1.0.0",
+    "@apollo/client": "^3.11.4",
+    "@hey/abis": "workspace:*",
     "@hey/data": "workspace:*",
     "@hey/lens": "workspace:*",
     "@hey/types": "workspace:*",
-    "axios": "^1.7.2",
-    "dayjs": "^1.11.11",
+    "axios": "^1.7.4",
+    "dayjs": "^1.11.12",
     "dotenv": "^16.4.5",
     "omit-deep": "^0.3.0",
     "urlcat": "^3.1.0",
-    "viem": "^2.16.4",
-    "winston": "^3.13.0"
+    "viem": "^2.19.7",
+    "winston": "^3.14.2"
   },
   "devDependencies": {
     "@hey/config": "workspace:*",
     "@types/omit-deep": "^0.3.2",
-    "typescript": "^5.5.2",
-    "vitest": "^1.6.0"
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
   }
 }

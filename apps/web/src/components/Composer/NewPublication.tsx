@@ -28,7 +28,7 @@ import getMentions from '@hey/helpers/getMentions';
 import getProfile from '@hey/helpers/getProfile';
 import removeQuoteOn from '@hey/helpers/removeQuoteOn';
 import { ReferenceModuleType } from '@hey/lens';
-import { Button, Card, ErrorMessage } from '@hey/ui';
+import { Button, Card, ErrorMessage, H6 } from '@hey/ui';
 import cn from '@hey/ui/cn';
 import { MetadataAttributeType } from '@lens-protocol/metadata';
 import { useUnmountEffect } from 'framer-motion';
@@ -39,7 +39,6 @@ import useCreatePoll from 'src/hooks/useCreatePoll';
 import useCreatePublication from 'src/hooks/useCreatePublication';
 import usePublicationMetadata from 'src/hooks/usePublicationMetadata';
 import { useCollectModuleStore } from 'src/store/non-persisted/publication/useCollectModuleStore';
-import { useOpenActionStore } from 'src/store/non-persisted/publication/useOpenActionStore';
 import { usePublicationAttachmentStore } from 'src/store/non-persisted/publication/usePublicationAttachmentStore';
 import { usePublicationAttributesStore } from 'src/store/non-persisted/publication/usePublicationAttributesStore';
 import {
@@ -84,10 +83,6 @@ const CollectSettings = dynamic(
   () => import('@components/Composer/Actions/CollectSettings'),
   { loading: () => Shimmer }
 );
-const OpenActionSettings = dynamic(
-  () => import('@components/Composer/Actions/OpenActionSettings'),
-  { loading: () => Shimmer }
-);
 const ReferenceSettings = dynamic(
   () => import('@components/Composer/Actions/ReferenceSettings'),
   { loading: () => Shimmer }
@@ -126,7 +121,8 @@ const NewPublication: FC<NewPublicationProps> = ({ publication }) => {
     publicationContent,
     quotedPublication,
     setPublicationContent,
-    setQuotedPublication
+    setQuotedPublication,
+    setTags
   } = usePublicationStore();
 
   // Audio store
@@ -155,9 +151,6 @@ const NewPublication: FC<NewPublicationProps> = ({ publication }) => {
     (state) => state
   );
 
-  // Open action store
-  const { openAction, reset: resetOpenActionSettings } = useOpenActionStore();
-
   // Reference module store
   const { degreesOfSeparation, onlyFollowers, selectedReferenceModule } =
     useReferenceModuleStore();
@@ -185,17 +178,17 @@ const NewPublication: FC<NewPublicationProps> = ({ publication }) => {
   const hasVideo = attachments[0]?.type === 'Video';
 
   const noCollect = !collectModule.type;
-  const noOpenAction = !openAction;
   // Use Momoka if the profile the comment or quote has momoka proof and also check collect module has been disabled
   const useMomoka = isComment
     ? publication?.momoka?.proof
     : isQuote
       ? quotedPublication?.momoka?.proof
-      : noCollect && noOpenAction;
+      : noCollect;
 
   const reset = () => {
     editor?.setMarkdown('');
     setPublicationContent('');
+    setTags(null);
     setShowPollEditor(false);
     resetPollConfig();
     setShowLiveVideoEditor(false);
@@ -205,7 +198,6 @@ const NewPublication: FC<NewPublicationProps> = ({ publication }) => {
     setAudioPublication(DEFAULT_AUDIO_PUBLICATION);
     setLicense(null);
     resetAttributes();
-    resetOpenActionSettings();
     resetCollectSettings();
   };
 
@@ -243,7 +235,6 @@ const NewPublication: FC<NewPublicationProps> = ({ publication }) => {
       publication_has_attachments: attachments.length > 0,
       publication_has_poll: showPollEditor,
       publication_is_live: showLiveVideoEditor,
-      publication_open_action: openAction?.address,
       publication_reference_module: selectedReferenceModule,
       publication_reference_module_degrees_of_separation:
         selectedReferenceModule ===
@@ -400,10 +391,6 @@ const NewPublication: FC<NewPublicationProps> = ({ publication }) => {
         });
       }
 
-      if (Boolean(openAction)) {
-        openActionModules.push({ unknownOpenAction: openAction });
-      }
-
       // Payload for the Momoka post/comment/quote
       const momokaRequest:
         | MomokaCommentRequest
@@ -558,9 +545,9 @@ const NewPublication: FC<NewPublicationProps> = ({ publication }) => {
       ) : null}
       <Editor />
       {publicationContentError ? (
-        <div className="mt-1 px-5 pb-3 text-sm font-bold text-red-500">
+        <H6 className="mt-1 px-5 pb-3 text-red-500">
           {publicationContentError}
-        </div>
+        </H6>
       ) : null}
       {showPollEditor ? <PollEditor /> : null}
       {showLiveVideoEditor ? <LivestreamEditor /> : null}
@@ -591,7 +578,6 @@ const NewPublication: FC<NewPublicationProps> = ({ publication }) => {
           {!publication?.momoka?.proof ? (
             <>
               <CollectSettings />
-              <OpenActionSettings />
               <ReferenceSettings />
             </>
           ) : null}

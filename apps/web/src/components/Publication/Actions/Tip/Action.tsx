@@ -4,7 +4,7 @@ import type { FC } from 'react';
 import type { Address } from 'viem';
 
 import errorToast from '@helpers/errorToast';
-import getAuthApiHeaders from '@helpers/getAuthApiHeaders';
+import { getAuthApiHeaders } from '@helpers/getAuthApiHeaders';
 import { Leafwatch } from '@helpers/leafwatch';
 import { HeyTipping } from '@hey/abis';
 import { Errors } from '@hey/data';
@@ -18,7 +18,7 @@ import {
 } from '@hey/data/constants';
 import { PUBLICATION } from '@hey/data/tracking';
 import formatAddress from '@hey/helpers/formatAddress';
-import { Button, HelpTooltip, Input, Select, Spinner } from '@hey/ui';
+import { Button, H6, HelpTooltip, Input, Select, Spinner } from '@hey/ui';
 import cn from '@hey/ui/cn';
 import axios from 'axios';
 import { useRef, useState } from 'react';
@@ -240,11 +240,11 @@ const Action: FC<ActionProps> = ({
 
   if (!address) {
     return (
-      <div className="m-5 space-y-3 text-sm font-bold">
-        <div>Connect to correct wallet to tip!</div>
-        <div className="ld-text-gray-500">
+      <div className="m-5 space-y-3">
+        <H6>Connect to correct wallet to tip!</H6>
+        <H6 className="ld-text-gray-500">
           Switch to: {formatAddress(currentProfile?.ownedBy.address)}
-        </div>
+        </H6>
       </div>
     );
   }
